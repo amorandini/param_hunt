@@ -1,0 +1,7 @@
+In order to make the figure plotting and performance evaluation faster, we have exported the output of ML algorithms and Monte-Carlo experiments.
+
+- [coverage](coverage) contains the coverage data (for either the benchmark masses or the whole parameter range)
+- [Cijs](Cijs) contains the compatibility measures. BB stands for compatibility between background events, SS between signal events and BS between background and signal events. In the case of signal event, we specify the benchmark mass. Their combination is performed in the notebooks so that backgrounds and signals in BS are matching. 
+- [roc] contains the performances necessary to plot the ROC curves for different models. File names are in the format  fprtpr_cl_(obs/post)_(small/large)_m_(mass)_model(i_model). obs (post) refer to ECO (EPO), small (large) for good (poor) resolution, mass is the benchmark mass in GeV, i_model is a model counter from 0 to 4
+- [counts](counts) contains the counting, so the TS distribution for different bins/threshold. File names are in the format counts_cl_(obs/post)_(small/large)_m_(mass)_model(i_model). obs (post) refer to ECO (EPO), small (large) for good (poor) resolution, mass is the benchmark mass in GeV.
+- [TS](TS) contains the performances related to test statics (p-values, Z) for different bins/threshold or fixed threshold and different strengths. File names are in the format perf_full_cl_(obs/post)_(small/large)_m_(mass)_model(i_model). obs (post) refer to ECO (EPO), small (large) for good (poor) resolution, mass is the benchmark mass in GeV.
