@@ -1,3 +1,4 @@
+# style parameters for figures
 le_size = 15
 la_size = 18
 ti_size = 18
