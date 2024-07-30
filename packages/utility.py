@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 # regularize the logarithm of the posterior by setting the minimum value to pref
 # already performs min max scaling internally
