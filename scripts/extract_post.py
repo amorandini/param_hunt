@@ -1,3 +1,4 @@
+# this script uses a trained classifier to extract psoteriors
 import numpy as np
 
 import tensorflow as tf
@@ -27,9 +28,7 @@ np.seterr(invalid='ignore') # remove warning divide by 0
 
 
 import argparse
-
 parser = argparse.ArgumentParser()
-parser.add_argument('--ship', type=int, help="short or ship?", default=0)
 parser.add_argument('--smear', type=int, help="small or large?", default=0)
 parser.add_argument('--ifile', type=int, help="train, bkg or sig file", default=0)
 parser.add_argument('--icol', type=int, help="column of event", default=0)
@@ -39,7 +38,6 @@ parser.add_argument('--mfixed', type=float, help="fixed mass for signal", defaul
 
 args = parser.parse_args()
 
-iSHIP = args.ship
 smear = args.smear
 ifile = args.ifile
 icol = args.icol
@@ -70,10 +68,13 @@ def prior_m():
 
 def prior_tm():
     return sts.uniform(loc=np.log10(tmalp_min), scale= np.log10(tmalp_max/tmalp_min))
+
+# load model
 dirfolder = "../models/model_post_"+labsm+"_0"
 model = keras.models.load_model(dirfolder+"/model.tf", compile=False)
 # we pick the two training files which will be converted in posteriors
 
+#from which file to extract the posterior
 if ifile == 1:
     trainfile = os.path.expanduser('~')+"/Desktop/Gitlab/classbump/data/event_train_11_"+par_lab+geo_lab+".csv"
 elif ifile == 0:
@@ -87,13 +88,16 @@ elif ifile == 13:
 feats=feature_extract(trainfile, sigs[0], sigs[1], sigs[2], sigs[3], Eres=1,  x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)
 x0 = feats.extract_llo(icol).T
 if ifile == 8:
-    malp, tmalp = feats.extract_model(0)
+    malp, tmalp = feats.extract_model(0) # signal model parameters are the same in the whole file
 else:
     malp, tmalp = feats.extract_model(icol)
 
 xzscaler = pickle.load(open(dirfolder+'/xzscaler.pkl', 'rb'))
 mrange = np.linspace(np.log10(malp_min), np.log10(malp_max), nlin) # no point in extending beyond the range due to the prior
+
+
 # assuming scaler and x0 have been already imported
+# extract posterior from X (including normalization)
 def postvals(mass_range, model, iS):
     X = np.hstack((mass_range.reshape(-1,1), np.array([x0[iS],]*len(mass_range))))
     X = xzscaler.transform(X)
@@ -103,10 +107,12 @@ def postvals(mass_range, model, iS):
     norm = trapezoid(postvals.T, mass_range.reshape(1,-1))
     return postvals/norm
 
+# scan over elements (not vectorialized or parallelized)
 posts = []
 for iS in range(Nsam):
     posts.append(np.append(np.array([malp[iS], tmalp[iS]]), np.log(postvals(mrange, model, iS))))
-# will contain -inf, can be regulrized later
+
+# will contain -inf, can be regularized later
 df = pd.DataFrame(np.array(posts))
 if mfixed:
     df.to_csv(post_path+"post_sig_"+str(ifile)+"_"+labsm+"_m_"+str(mfixed)+"_"+str(icol)+".csv", index=False)

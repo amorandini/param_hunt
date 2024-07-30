@@ -1,3 +1,4 @@
+# returns the TS distribution for bumphunt
 import numpy as np
 import os
 
@@ -59,6 +60,7 @@ perfs = []
 sigfile = data_path + "event_sig_8_m_"+str(mfixed)+"_"+str(mfixed)+"_tm_1.0_1.0_"+geo_lab+".csv"
 bkgfile = data_path + "event_bkg_13_"+par_lab+geo_lab+".csv"
 
+# we define the single step process which can be parallelized
 def processInput(nbkg, nsig, nbin):
     nobs = nbkg + nsig
     if nobs < 2:
@@ -87,10 +89,10 @@ def processInput(nbkg, nsig, nbin):
             XS = x1
             del x1, feats, features
 
-
+        # compute the invariant mass from the features
         mggS = mgg(XS)
 
-    
+        # bin and count
         countsS = bphunt(np.log10(mggS), nbin, [-1.5, 0.8]).over(3)
         return([nbkg, nsig, nbin, countsS])
 perfs = (Parallel(n_jobs=num_cores)(delayed(processInput)(nbkg, nsig, nbin) for nbkg in range(nbkgmax+1) for nsig in range(nsigmax+1) for nbin in range(4,nbin_max)))

@@ -1,3 +1,4 @@
+# script to export the Cij for ECO hunt
 import numpy as np
 import random
 
@@ -61,6 +62,7 @@ for smear in [0, 1]:
     features = np.vstack(([feats.extract_llo(iOBS) for iOBS in range(nbkgmax)]))  
     XB = features.T
 
+    # apply ECO hunt on pairs of bkg events
     Cij = []
     for i in range(nbkgmax):
         for j in range(i+1, nbkgmax):
@@ -73,6 +75,7 @@ for smear in [0, 1]:
 
     np.save("../performances/Cijs/CijBB_"+labsm+".npy", CijBB)
 
+    # apply ECO hunt on pairs of signal events and a bkg+signal pair
     for mfixed in [0.2, 1., 4.]:
         sigfile = data_path + "event_sig_8_m_"+str(mfixed)+"_"+str(mfixed)+"_tm_1.0_1.0_"+geo_lab+".csv"
         np.random.seed(42)

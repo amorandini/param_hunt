@@ -1,3 +1,5 @@
+# extract the performances
+# this is used to choose the threshold
 import numpy as np
 import random
 
@@ -34,12 +36,12 @@ if smear ==0:
 elif smear == 1:
     sigs, labsm = [0.001,0.05,0.01,  0.01  ], "large"
 
-# increase number of spaces for better visualization
+# we select some levels of background and signal normalization
 mubspace = np.linspace(0.5, 6, 12)
 musspace = np.linspace(0.5, 4, 8)
 
 
-
+# we parallelize the process over the normalizations
 def TS_par(dfc_opt, mub,mus):
     nbkgsig = np.array([sts.poisson(mub).rvs(Nsamples), sts.poisson(mus).rvs(Nsamples)])
     nnurbkg = np.array([sts.poisson(mub).rvs(Nsamples), np.zeros(Nsamples)])
@@ -48,7 +50,7 @@ def TS_par(dfc_opt, mub,mus):
 
     return([mub, mus, perf_pval(countB, countS).meanp(), perf_pval(countB, countS).meanlogp(), perf_pval(countB, countS).meansigma()])
 
-
+# we import the counts and extract the performances (for ECO)
 perf_ECO = []
 with open("../performances/counts/count_cl_"+labsm+"_m_"+str(mfixed)+".pickle", "rb") as fp:  
     countsS = pickle.load(fp)
@@ -60,6 +62,7 @@ for opt_thro in np.linspace(0.04,0.96, 24):
 perf_ECO = np.array(perf_ECO)
 perf_ECO = perf_ECO.reshape(perf_ECO.shape[0]*perf_ECO.shape[1],perf_ECO.shape[2])
 
+# we import the counts and extract the performances (for EPO)
 perf_EPO = []
 with open("../performances/counts/count_cl_post_"+labsm+"_m_"+str(mfixed)+".pickle", "rb") as fp:  
     countsS = pickle.load(fp)

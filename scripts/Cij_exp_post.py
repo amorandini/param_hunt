@@ -62,6 +62,7 @@ for smear in [0, 1]:
     XB= feats.extract_post(nbkgmax)
     XB = XB.reshape(10000,nbkgmax,200)
 
+    # apply EPO hunt on pairs of bkg events
     Cij = []
     for i in range(nbkgmax):
         for j in range(i+1, nbkgmax):
@@ -74,6 +75,7 @@ for smear in [0, 1]:
 
     np.save("../performances/Cijs/CijBB_post_"+labsm+".npy", CijBB)
 
+    # apply EPO hunt on pairs of bkg events
     for mfixed in [0.2, 1., 4.]:
         sigfile = post_path +  "post_sig_8_"+labsm+"_m_"+str(mfixed)+".csv"
         np.random.seed(42)

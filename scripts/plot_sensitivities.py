@@ -1,3 +1,4 @@
+# this script just automates the plotting of the sensitivities
 import numpy as np
 import random
 
@@ -34,8 +35,8 @@ smear = args.smear
 mfixed = args.mfixed
 Nsamples = args.Nsam
 Nobs = 10000 # fixed by file size
-opt_thro = args.opt_thr
-opt_thrp = args.opt_thr
+opt_thro = args.opt_thr # can fix the threshold as input 
+opt_thrp = args.opt_thr # can fix the threshold as input
 
 
 if smear ==0:
@@ -43,7 +44,7 @@ if smear ==0:
 elif smear == 1:
     sigs, labsm = [0.001,0.05,0.01,  0.01  ], "large"
 
-# from before, could be changed at will, new version where opt_thr is introduced externally
+# from before, could be changed at will
 if mfixed == 0.2:
     opt_bin = 4
 
@@ -62,6 +63,8 @@ elif mfixed == 4.:
 mubspace = np.linspace(0.1, 6, 25)
 musspace = np.linspace(0.1, 4, 25)
 
+
+# we parallelize the process over the normalizations
 def TS_par(dfc_opt, mub,mus):
     nbkgsig = np.array([sts.poisson(mub).rvs(Nsamples), sts.poisson(mus).rvs(Nsamples)])
     nnurbkg = np.array([sts.poisson(mub).rvs(Nsamples), np.zeros(Nsamples)])
@@ -92,6 +95,7 @@ TS_EPO = np.array((Parallel(n_jobs=num_cores)(delayed(TS_par)(dfc_opt, mub, mus)
 
 mux, muy = np.meshgrid(musspace, mubspace)
 
+# plot the sensitivities
 def plot_heat(axs, arr0, arr1, arr2, ifeat):
 
     minv, maxv = np.min([np.min(arr0[:,ifeat]), np.min(arr1[:,ifeat]), np.min(arr2[:,ifeat])]), np.max([np.max(arr0[:,ifeat]), np.max(arr1[:,ifeat]), np.max(arr2[:,ifeat])])
@@ -154,6 +158,7 @@ from scipy.ndimage import gaussian_filter
 nsteps = 8
 prec = 2
 
+# plot the improvement in sensitivity
 def plot_improv(ax, arr0, arr1, ifeat):
 
     minv, maxv = np.min([np.min(TS_ECO[:,ifeat]-TS_bump[:,ifeat]), np.min(TS_EPO[:,ifeat]-TS_bump[:,ifeat])]), np.max([np.max(TS_ECO[:,ifeat]-TS_bump[:,ifeat]), np.max(TS_EPO[:,ifeat]-TS_bump[:,ifeat])])

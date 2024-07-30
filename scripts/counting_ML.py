@@ -1,3 +1,6 @@
+# this exports the TS distribution for the ML approaches
+# but works on Cij, so no need to call the models
+# can be done purely on (parallelized) CPU
 import numpy as np
 import os
 
@@ -15,13 +18,6 @@ import multiprocessing
 num_cores = multiprocessing.cpu_count()
 
 np.seterr(invalid='ignore') # remove warning divide by 0
-
-def reg_log(x, pref):
-    y=np.copy(x)
-    y[y<pref]=pref
-    y = (y-pref)/(np.max(y, axis=(1,2)).reshape(-1,1,1)-pref)
-    return y
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--post', type=int, help="Use posteriors", default=0)
@@ -42,6 +38,7 @@ if smear ==0:
 elif smear == 1:
     sigs, labsm = [0.001,0.05,0.01,  0.01  ], "large"
 
+# import the already computed Cij
 labpost="_"
 if post:
     labpost = "_post_"
@@ -49,6 +46,7 @@ CijSS = np.load("../performances/Cijs/CijSS"+labpost+str(mfixed)+"_"+labsm+".npy
 CijBS = np.load("../performances/Cijs/CijBS"+labpost+str(mfixed)+"_"+labsm+".npy")
 CijBB = np.load("../performances/Cijs/CijBB"+labpost+labsm+".npy")
 
+# use routine to extract TS from Cij given a certain threshold
 def processInput(nbkg, nsig, thresh):
     nobs = nbkg + nsig
     if nobs < 2:
