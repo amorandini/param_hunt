@@ -1,4 +1,4 @@
-The repository contains the necessary tools to simulate and analyze beamdump simulations.
+The repository contains the necessary tools to simulate and analyze beamdump simulations, as described in [our paper](https://arxiv.org/abs/2407.20329)
 
 The simulations are in the folder [data](data), this contains:
 - python scripts used to generate the data, especially [generate](data/generate_dataset.py). Prior is log-uniform on lifetime over mass and on mass. Current setup is for short on-axis experiment (SHiP design is implemented on my workstation but not synced yet until I'm happy with it)
